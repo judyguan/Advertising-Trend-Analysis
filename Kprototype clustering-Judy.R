@@ -3,7 +3,7 @@ setwd("~/Downloads/Analytic Trends Project Data /CampaignPerformanceTable")
 library(dplyr)
 library(readr)
 library(clustMixType)
-#Get the file names
+#Get the file name in csv format
 files = list.files(pattern="*.csv")
 # First apply read.csv, then rbind
 CampaignPerformanceTable = do.call(rbind, lapply(files, function(x) read.csv(x, stringsAsFactors = FALSE,header=FALSE)))
