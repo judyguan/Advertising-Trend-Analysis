@@ -44,7 +44,6 @@ CampaignPerformanceTable$device_category <- as.factor(CampaignPerformanceTable$d
 CampaignPerformanceTable$creative_size <- as.factor(CampaignPerformanceTable$creative_size)
 CampaignPerformanceTable$CampaignID <- as.factor(CampaignPerformanceTable$CampaignID)
 
-
 #clean outlier in click
 CampaignPerformanceTable$click_clear = CampaignPerformanceTable$click
 CampaignPerformanceTable$click_clear[which(CampaignPerformanceTable$click_clear > 100)] = 100
@@ -159,8 +158,6 @@ kpres3
 #4:   65+      M    125k+   145.88246 0.1705226
 
 
-
-
 #region4: Southwest
 Southwest <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "Southwest"),]
 clustering_Southwest <- Southwest[,6:10]
@@ -184,7 +181,6 @@ kpres4
 #1: 55-64      M   <75k    50.31117 0.1940068
 #2: 45-54      F  125k+    69.41027 0.1505698
 #3: 55-64      F   <75k   603.59631 0.4016393
-
 
 
 #region5: West
