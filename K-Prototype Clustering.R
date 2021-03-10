@@ -1,3 +1,4 @@
+#Part1: Data Cleaning and Preparation 
 #read campaign performance table
 setwd("~/Downloads/Analytic Trends Project Data /CampaignPerformanceTable")
 library(dplyr)
@@ -43,7 +44,6 @@ CampaignPerformanceTable$income <- as.factor(CampaignPerformanceTable$income)
 CampaignPerformanceTable$device_category <- as.factor(CampaignPerformanceTable$device_category)
 CampaignPerformanceTable$creative_size <- as.factor(CampaignPerformanceTable$creative_size)
 CampaignPerformanceTable$CampaignID <- as.factor(CampaignPerformanceTable$CampaignID)
-
 #clean outlier in click
 CampaignPerformanceTable$click_clear = CampaignPerformanceTable$click
 CampaignPerformanceTable$click_clear[which(CampaignPerformanceTable$click_clear > 100)] = 100
@@ -55,12 +55,12 @@ CampaignPerformanceTable$impressions_clear[which(CampaignPerformanceTable$impres
 summary(CampaignPerformanceTable$impressions)
 summary(CampaignPerformanceTable$impressions_clear)
 
-###################################################clustering altogether##################################################################################
-###region 1: Midwest 1967716 obs.
+
+#Part2: K-Prototype Clustering(for large mixed dataset)
+#region 1: Midwest 1967716 obs.
 Midwest <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "Midwest"),]
 head(Midwest)
 str(Midwest)
-
 #selecting age,gender,income and impressions
 #clustering_midwest <- Midwest[,6:10]
 clustering_midwest <- Midwest[,c("age","gender","income","click_clear","impressions_clear")]
@@ -89,24 +89,10 @@ plot(1:k.max, wss,
      xlab="Number of clusters K",
      ylab="Total within-clusters sum of squares")    #picked cluster 4
 #cluster 4 is the optimal choice
-#kproto!!!
-#http://www.imsbio.co.jp/RGM/R_rdfile?f=clustMixType/man/kproto.Rd&d=R_CC
 library(clustMixType)
 kpres <- kproto(Midwestdata, 4)
 clprofiles(kpres, Midwestdata)
-kpres
-#Cluster prototypes:
-#age gender income impressions     click
-#1: 35-44      F   <75k  1908.68000 1.1709091
-#2: 55-64      F   <75k   497.69787 0.3212273
-#3: 35-44      M   <75k    85.23576 0.1937867
-#4:   65+      F   <75k    67.46559 0.2556075
-
-
-#kpres <- kproto(smalldata, 2,lambda=0.1)
-#clprofiles(kpres, smalldata)
-#kpres <- kproto(smalldata, 2,lambda=25)
-#clprofiles(kpres, smalldata)
+kpres #output cluster prototypes
 
 #region 2: Northeast
 Northeast <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "Northeast"),]
@@ -125,13 +111,8 @@ plot(1:k2.max, wss2,
 #run K protype model using the optimal cluster number 
 kpres2 <- kproto(Northeast_sample, 4) 
 clprofiles(kpres2, Northeast_sample)
-kpres2
-#age gender   income impressions     click
-#1: 35-44      M 75-<125k    113.8719 0.2223166
-#2: 25-34      F     <75k    205.0366 0.2507994
-#3:   <25      M    125k+     79.2344 0.2651638
-#4: 25-34      F     <75k   1658.2082 0.7755544
-  
+kpres2 #output cluster prototypes
+
 #region3: Southeast
 Southeast <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "Southeast"),]
 clustering_Southeast <- Southeast[,6:10]
@@ -149,14 +130,7 @@ plot(1:k3.max, wss3,
 #run K protype model using the optimal cluster number 
 kpres3 <- kproto(Southeast_sample, 4)  #4 clusters
 clprofiles(kpres3, Southeast_sample)
-kpres3
-#Cluster prototypes:
-#  age gender   income impressions     click
-#1:   65+      F     <75k   968.18192 0.6910755
-#2:   65+      F 75-<125k    47.77333 0.2740162
-#3: 45-54      M     <75k    80.62556 0.2108053
-#4:   65+      M    125k+   145.88246 0.1705226
-
+kpres3 #output cluster prototypes
 
 #region4: Southwest
 Southwest <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "Southwest"),]
@@ -175,13 +149,7 @@ plot(1:k4.max, wss4,
 #run K protype model using the optimal cluster number 
 kpres4 <- kproto(Southwest_sample, 3)  #3 clusters
 clprofiles(kpres4, Southwest_sample)
-kpres4
-#Cluster prototypes:
-#age gender income impressions     click
-#1: 55-64      M   <75k    50.31117 0.1940068
-#2: 45-54      F  125k+    69.41027 0.1505698
-#3: 55-64      F   <75k   603.59631 0.4016393
-
+kpres4 #output cluster prototypes
 
 #region5: West
 West <- CampaignPerformanceTable[which(CampaignPerformanceTable$Region == "West"),]
@@ -200,93 +168,4 @@ plot(1:k5.max, wss5,
 #run K protype model using the optimal cluster number 
 kpres5 <- kproto(West_sample, 3)  #3 clusters
 clprofiles(kpres5, West_sample)
-kpres5
-
-
-#K-protptyping
-for large mixed dataset
-
-
-###################################################clustering by beauty and fashion##################################################################################
-###Region 1: Midwest 1967716 obs.
-Midwest_beauty = Midwest[(Midwest$CampaignID=='162554' | 
-                            Midwest$CampaignID=='167587' |
-                            Midwest$CampaignID=='165864' |
-                            Midwest$CampaignID=='168250' |
-                            Midwest$CampaignID=='166489' |
-                            Midwest$CampaignID=='184598' |
-                            Midwest$CampaignID=='163695' |
-                            Midwest$CampaignID=='193334' ), ]
-
-#selecting age,gender,income and impressions
-clustering_midwest_beauty <- Midwest_beauty[,6:10]
-
-#stratified sampling
-library(splitstackshape)
-set.seed(11)
-Midwestdata_beauty <- stratified(clustering_midwest_beauty,c("age","gender","income","impressions","click"),10)
-
-# Elbow Method for finding the optimal number of clusters
-library(clustMixType)
-set.seed(12)
-# Compute and plot wss for k = 2 to k = 9.
-k6.max <- 9
-wss6 <- sapply(1:k6.max, 
-              function(k6){kproto(Midwestdata_beauty, k6)$tot.withinss})
-wss6
-plot(1:k6.max, wss6,
-     type="b", pch = 19, frame = FALSE, 
-     xlab="Number of clusters K",
-     ylab="Total within-clusters sum of squares")    #picked cluster 3
-#cluster 4 is the optimal choice
-#kproto!!!
-#http://www.imsbio.co.jp/RGM/R_rdfile?f=clustMixType/man/kproto.Rd&d=R_CC
-library(clustMixType)
-kpres6 <- kproto(Midwestdata_beauty, 3)
-clprofiles(kpres6, Midwestdata_beauty)
-kpres6
-#Cluster prototypes:
-#  age gender income impressions     click
-#1:   65+      F  125k+   100.09518 0.1663626
-#2: 35-44      M   <75k  1106.62398 0.7113821
-#3: 25-34      F   <75k    74.94583 0.2205103
-
-#midwest fashion
-Midwest_fashion = Midwest[(Midwest$CampaignID=='167179' | 
-                             Midwest$CampaignID=='164742' |
-                             Midwest$CampaignID=='164706' |
-                             Midwest$CampaignID=='167137' |
-                             Midwest$CampaignID=='182273' |
-                             Midwest$CampaignID=='183204' |
-                             Midwest$CampaignID=='184491' |
-                             Midwest$CampaignID=='184120' |
-                             Midwest$CampaignID=='188753' |
-                             Midwest$CampaignID=='189877' |
-                             Midwest$CampaignID=='167392'), ]
-#selecting age,gender,income and impressions
-clustering_midwest_fashion <- Midwest_fashion[,6:10]
-
-#stratified sampling
-library(splitstackshape)
-set.seed(13)
-Midwestdata_fashion <- stratified(clustering_midwest_fashion,c("age","gender","income","impressions","click"),10)
-
-# Elbow Method for finding the optimal number of clusters
-library(clustMixType)
-set.seed(14)
-# Compute and plot wss for k = 2 to k = 9.
-k7.max <- 9
-wss7 <- sapply(1:k7.max, 
-               function(k7){kproto(Midwestdata_fashion, k7)$tot.withinss})
-wss7
-plot(1:k7.max, wss7,
-     type="b", pch = 19, frame = FALSE, 
-     xlab="Number of clusters K",
-     ylab="Total within-clusters sum of squares")    #picked cluster 3
-library(clustMixType)
-kpres7 <- kproto(Midwestdata_fashion, 3)
-clprofiles(kpres7, Midwestdata_fashion)
-kpres7
-
-##############################################################Region2: 
-
+kpres5 #output cluster prototypes
